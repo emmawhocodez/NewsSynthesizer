@@ -28,7 +28,7 @@ def getTextFromWebElements(webElements):
 
 """
 Collects news and blog articles from Finviz.com.
-Returns the articles as a 
+Returns the article text as a list
 """
 def scrapeNewsFromFinviz():
     finvizURL = 'https://finviz.com/news.ashx'
@@ -41,6 +41,10 @@ def scrapeNewsFromFinviz():
     return articles
 
 
+"""
+Collects news and blog articles from Bloomberg.com.
+Returns the article text as a list
+"""
 def scrapeNewsFromBloomberg():
     bloombergURL = 'https://www.bloomberg.com/'
     driver = getDriverWithCookies(bloombergURL)
