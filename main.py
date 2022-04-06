@@ -18,6 +18,14 @@ def getDriverWithCookies(url):
     return driver
 
 
+def getTextFromWebElements(webElements):
+    list = []
+    for i in webElements:
+        list.append(i.text)
+
+    return list
+
+
 """
 Collects news and blog articles from Finviz.com.
 Returns the articles as a 
@@ -27,8 +35,10 @@ def scrapeNewsFromFinviz():
     driver = getDriverWithCookies(finvizURL)
     newsAndBlogs = driver.find_elements(By.CLASS_NAME, "nn-tab-link")
 
+    articles = getTextFromWebElements(newsAndBlogs)
+
     driver.close()
-    return newsAndBlogs
+    return articles
 
 
 def scrapeNewsFromBloomberg():
@@ -36,12 +46,12 @@ def scrapeNewsFromBloomberg():
     driver = getDriverWithCookies(bloombergURL)
 
     # Multiple elements contain news articles
-    newsArticles = driver.find_elements(By.CLASS_NAME, "story-list-story__info__headline")
-    newsArticles += driver.find_elements(By.CLASS_NAME, "single-story-module__related-story-link")
+    newsWebElements = driver.find_elements(By.CLASS_NAME, "story-list-story__info__headline")
+    newsWebElements += driver.find_elements(By.CLASS_NAME, "single-story-module__related-story-link")
 
+    articles = getTextFromWebElements(newsWebElements)
     driver.close()
-
-    return newsArticles
+    return articles
 
 
 if __name__ == '__main__':
@@ -49,5 +59,5 @@ if __name__ == '__main__':
     news += scrapeNewsFromFinviz()
     news += scrapeNewsFromBloomberg()
 
-    for i in news.text:
+    for i in news:
         print(i)
