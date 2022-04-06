@@ -1,7 +1,8 @@
 from webdriver_manager.chrome import ChromeDriverManager
 from selenium import webdriver
 from selenium.webdriver.common.by import By
-
+import config
+import smtplib
 
 """ 
 Takes in a URL that is the desired website to scrape
@@ -57,6 +58,22 @@ def scrapeNewsFromBloomberg():
     driver.close()
     return articles
 
+
+def sendEmail(emailContents):
+    smtp_server = "smtp.gmail.com"
+    content =  f'SUBJECT: {config.message}\n\n{emailContents}'
+    server = smtplib.SMTP(smtp_server, 587)
+    try:
+        server.ehlo()
+        server.starttls()
+
+        server.login(config.username, config.password)
+        server.sendmail(config.sender, config.recipients, content)
+        server.close()
+
+    except Exception as e:
+        print(e)
+        server.close()
 
 if __name__ == '__main__':
     news = []
