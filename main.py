@@ -27,22 +27,27 @@ def scrapeNewsFromFinviz():
     driver = getDriverWithCookies(finvizURL)
     newsAndBlogs = driver.find_elements(By.CLASS_NAME, "nn-tab-link")
 
-    for title in newsAndBlogs:
-        print(title.text)
-
     driver.close()
+    return newsAndBlogs
 
 
 def scrapeNewsFromBloomberg():
     bloombergURL = 'https://www.bloomberg.com/'
     driver = getDriverWithCookies(bloombergURL)
-    newsArticles = driver.find_elements(By.CLASS_NAME, "hub-main")
 
-    for title in newsArticles:
-        print(title.text)
+    # Multiple elements contain news articles
+    newsArticles = driver.find_elements(By.CLASS_NAME, "story-list-story__info__headline")
+    newsArticles += driver.find_elements(By.CLASS_NAME, "single-story-module__related-story-link")
 
     driver.close()
 
+    return newsArticles
+
+
 if __name__ == '__main__':
-    scrapeNewsFromFinviz()
-    scrapeNewsFromBloomberg()
+    news = []
+    news += scrapeNewsFromFinviz()
+    news += scrapeNewsFromBloomberg()
+
+    for i in news.text:
+        print(i)
