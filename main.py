@@ -58,7 +58,7 @@ def scrapeBloombergNews():
 
 
 def scrapeCNBCNews():
-    cnbcURL = "cnbc.com"
+    cnbcURL = 'https://www.cnbc.com'
     driver = getDriverWithCookies(cnbcURL)
 
     webElements = driver.find_elements(By.CLASS_NAME, 'LatestNews-headline')
@@ -90,6 +90,7 @@ if __name__ == '__main__':
     news = {}
     news.update(scrapeFinvizNews())
     news.update(scrapeBloombergNews())
+    news.update(scrapeCNBCNews())
 
     for key, value in news.items():
         if key is not None and value is not None:
