@@ -19,12 +19,11 @@ def getDriverWithCookies(url):
     return driver
 
 
-def getTextAndLinksFromWebElements(webElements):
-    list = {}
+def getTitlesAndLinksFromWebElements(webElements):
+    dictionary = {}
     for i in webElements:
-        list[i.text] = i.get_attribute("href")
-
-    return list
+        dictionary[i.text] = i.get_attribute("href")
+    return dictionary
 
 
 """
@@ -36,9 +35,9 @@ def scrapeFinvizNews():
     driver = getDriverWithCookies(finvizURL)
     webElements = driver.find_elements(By.CLASS_NAME, 'nn-tab-link')
 
-    articlesAndLinks = getTextAndLinksFromWebElements(webElements)
+    titlesAndLinks = getTitlesAndLinksFromWebElements(webElements)
     driver.close()
-    return articlesAndLinks
+    return titlesAndLinks
 
 
 """
@@ -53,14 +52,26 @@ def scrapeBloombergNews():
     webElements = driver.find_elements(By.CLASS_NAME, 'story-list-story__info__headline')
     webElements += driver.find_elements(By.CLASS_NAME, 'single-story-module__related-story-link')
 
-    articlesAndLinks = getTextAndLinksFromWebElements(webElements)
+    titlesAndLinks = getTitlesAndLinksFromWebElements(webElements)
     driver.close()
-    return articlesAndLinks
+    return titlesAndLinks
+
+
+def scrapeCNBCNews():
+    cnbcURL = "cnbc.com"
+    driver = getDriverWithCookies(cnbcURL)
+
+    webElements = driver.find_elements(By.CLASS_NAME, 'LatestNews-headline')
+
+    titlesAndLinks = getTitlesAndLinksFromWebElements(webElements)
+    driver.close()
+    return titlesAndLinks
+
 
 """Sends an email using config file contents """
 def sendEmail(emailContents):
     smtp_server = 'smtp.gmail.com'
-    content =  f'SUBJECT: {config.message}\n\n{emailContents}'
+    content = f'SUBJECT: {config.message}\n\n{emailContents}'
     server = smtplib.SMTP(smtp_server, 587)
     try:
         server.ehlo()
@@ -81,5 +92,5 @@ if __name__ == '__main__':
     news.update(scrapeBloombergNews())
 
     for key, value in news.items():
-        if key != None and value != None:
+        if key is not None and value is not None:
             print(key + " " + value)
