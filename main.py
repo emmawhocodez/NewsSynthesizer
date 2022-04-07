@@ -19,48 +19,47 @@ def getDriverWithCookies(url):
     return driver
 
 
-def getTextFromWebElements(webElements):
-    list = []
+def getTextAndLinksFromWebElements(webElements):
+    list = {}
     for i in webElements:
-        list.append(i.text)
+        list[i.text] = i.get_attribute("href")
 
     return list
 
 
 """
 Collects news and blog articles from Finviz.com.
-Returns the article text as a list
+Returns the article titles and links as a dictionary
 """
-def scrapeNewsFromFinviz():
+def scrapeFinvizNews():
     finvizURL = 'https://finviz.com/news.ashx'
     driver = getDriverWithCookies(finvizURL)
-    newsAndBlogs = driver.find_elements(By.CLASS_NAME, "nn-tab-link")
+    webElements = driver.find_elements(By.CLASS_NAME, 'nn-tab-link')
 
-    articles = getTextFromWebElements(newsAndBlogs)
-
+    articlesAndLinks = getTextAndLinksFromWebElements(webElements)
     driver.close()
-    return articles
+    return articlesAndLinks
 
 
 """
 Collects news and blog articles from Bloomberg.com.
-Returns the article text as a list
+Returns the article titles and links as a dictionary
 """
-def scrapeNewsFromBloomberg():
+def scrapeBloombergNews():
     bloombergURL = 'https://www.bloomberg.com/'
     driver = getDriverWithCookies(bloombergURL)
 
     # Multiple elements contain news articles
-    newsWebElements = driver.find_elements(By.CLASS_NAME, "story-list-story__info__headline")
-    newsWebElements += driver.find_elements(By.CLASS_NAME, "single-story-module__related-story-link")
+    webElements = driver.find_elements(By.CLASS_NAME, 'story-list-story__info__headline')
+    webElements += driver.find_elements(By.CLASS_NAME, 'single-story-module__related-story-link')
 
-    articles = getTextFromWebElements(newsWebElements)
+    articlesAndLinks = getTextAndLinksFromWebElements(webElements)
     driver.close()
-    return articles
+    return articlesAndLinks
 
-
+"""Sends an email using config file contents """
 def sendEmail(emailContents):
-    smtp_server = "smtp.gmail.com"
+    smtp_server = 'smtp.gmail.com'
     content =  f'SUBJECT: {config.message}\n\n{emailContents}'
     server = smtplib.SMTP(smtp_server, 587)
     try:
@@ -75,10 +74,12 @@ def sendEmail(emailContents):
         print(e)
         server.close()
 
-if __name__ == '__main__':
-    news = []
-    news += scrapeNewsFromFinviz()
-    news += scrapeNewsFromBloomberg()
 
-    for i in news:
-        print(i)
+if __name__ == '__main__':
+    news = {}
+    news.update(scrapeFinvizNews())
+    news.update(scrapeBloombergNews())
+
+    for key, value in news.items():
+        if key != None and value != None:
+            print(key + " " + value)
