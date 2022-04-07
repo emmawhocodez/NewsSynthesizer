@@ -68,7 +68,7 @@ def sendEmail(emailContents):
         server.starttls()
 
         server.login(config.username, config.password)
-        server.sendmail(config.sender, config.recipients, content)
+        server.sendmail(config.sender, config.recipient, content)
         server.close()
 
     except Exception as e:
