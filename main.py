@@ -3,6 +3,8 @@ from selenium import webdriver
 from selenium.webdriver.common.by import By
 import config
 import smtplib
+import ssl
+
 
 """ 
 Takes in a URL that is the desired website to scrape
@@ -57,6 +59,10 @@ def scrapeBloombergNews():
     return titlesAndLinks
 
 
+"""
+Collects news and blog articles from CNBC.com.
+Returns the article titles and links as a dictionary
+"""
 def scrapeCNBCNews():
     cnbcURL = 'https://www.cnbc.com'
     driver = getDriverWithCookies(cnbcURL)
@@ -70,16 +76,16 @@ def scrapeCNBCNews():
 
 """Sends an email using config file contents """
 def sendEmail(emailContents):
-    smtp_server = 'smtp.gmail.com'
-    content = f'SUBJECT: {config.message}\n\n{emailContents}'
-    server = smtplib.SMTP(smtp_server, 587)
-    try:
-        server.ehlo()
-        server.starttls()
+    smtp_server = 'smtp.mail.yahoo.com'
+    content = f'SUBJECT: {config.message}\n\n{emailContents}'.encode("utf-8")
 
-        server.login(config.username, config.password)
-        server.sendmail(config.sender, config.recipient, content)
-        server.close()
+    try:
+        with smtplib.SMTP_SSL(smtp_server, 465) as server:
+
+            server.ehlo()
+            server.login(config.username, config.password)
+            server.sendmail(config.sender, config.recipient, content)
+            server.close()
 
     except Exception as e:
         print(e)
@@ -92,6 +98,9 @@ if __name__ == '__main__':
     news.update(scrapeBloombergNews())
     news.update(scrapeCNBCNews())
 
+    emailContents = ''
     for key, value in news.items():
         if key is not None and value is not None:
-            print(key + " " + value)
+            emailContents += key + " " + value + "\n"
+
+    sendEmail(emailContents)
